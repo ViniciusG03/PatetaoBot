@@ -1,0 +1,13 @@
+name: DiscordBot
+version: '1.0-SNAPSHOT'
+main: org.menosprezo.discordBot.DiscordBot
+api-version: '1.21'
+authors: [ menosprezo ]
+description: Discord Bot for PatetaMC Server
+website: menosprezo.online
+commands:
+  staffchat:
+    description: Sistema de chat da equipe
+    aliases: [sc]
+  chat:
+    description: Gerenciamento do sistema de chat
