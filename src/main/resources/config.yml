@@ -1,2 +1,29 @@
-bot:
+formats:
+  staff: "&e[STAFF] %tag%%author%&f: &7%content%"
+  global: "%tag%%author%%suffix%&f: &7%content%"
+
+messages:
+  permission: "&cVocê não tem permissão para executar esse comando."
+  cooldown: "&cVocê precisa esperar um pouco para mandar mensagem novamente."
+  disabled: "&cO chat está desativado no momento."
+  badword: "&cVocê não pode escrever essa palavra no chat."
+  chat:
+    receiveEnabled: "&aVocê agora está recebendo mensagens da equipe."
+    receiveDisabled: "&cVocê agora não está mais recebendo mensagens da equipe."
+    staff: "&aVocê agora está falando no chat da equipe."
+    global: "&cVocê agora está falando no chat principal."
+    disabled: "&cChat desativado com sucesso."
+    enabled: "&aChat ativado com sucesso."
+
+badwords:
+  - "test"
+
+discord:
   token:
+  webhook: "https://discordapp.com/api/webhooks/1281467762354552995/IoX_gP9lrREPTxFO_TTs2_K7Da_-gEaFdQqc2OO4qnDmGau-rW53R5X847ycD_N5hGfF"
+  channel: "1279164582077661184"
+
+chat: true
+cooldown: 2
+
+data:

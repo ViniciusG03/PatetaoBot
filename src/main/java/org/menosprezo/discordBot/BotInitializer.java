@@ -5,12 +5,14 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.internal.utils.JDALogger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.menosprezo.discordBot.commands.SlashCommandListener;
 import org.menosprezo.discordBot.commands.TicketCommandListener;
+import org.menosprezo.discordBot.listeners.MessageListener;
 import org.menosprezo.discordBot.listeners.SlashCommandRegisterer;
-import org.menosprezo.discordBot.listeners.SugestionChannelListener;
+import org.menosprezo.discordBot.listeners.SuggestionListener;
 import org.menosprezo.discordBot.listeners.WelcomeListener;
 
 import java.util.Arrays;
@@ -18,27 +20,33 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class BotInitializer {
+public class BotInitializer extends Thread {
 
     private final WelcomeListener welcomeListener = new WelcomeListener();
     private final SlashCommandListener slashCommandListener = new SlashCommandListener(this);
     private final SlashCommandRegisterer slashCommandRegisterer = new SlashCommandRegisterer();
     private final TicketCommandListener ticketCommandListener = new TicketCommandListener(this);
-    private final SugestionChannelListener sugestionChannelListener = new SugestionChannelListener();
+    private final SuggestionListener suggestionListener = new SuggestionListener();
+    private final MessageListener messageListener = new MessageListener();
 
     private static final List<String> MESSAGES = Arrays.asList(
-      "Vem com o patetão😎 ", "O resto é resto!", "pateta.xyz", "🤫"
+            "Vem com o patetão😎", "O resto é resto!", "pateta.xyz", "🤫"
     );
-
     private static final int UPDATE_INTERVAL = 3000;
 
     private String token;
-
     private JDA jda;
+    private final JavaPlugin plugin;
 
-    public void startBot(JavaPlugin plugin) {
+    public BotInitializer(JavaPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    @Override
+    public void run() {
         try {
-            token = plugin.getConfig().getString("bot.token");
+            JDALogger.setFallbackLoggerEnabled(false);
+            token = plugin.getConfig().getString("discord.token");
 
             jda = JDABuilder.createDefault(token)
                     .enableIntents(
@@ -49,28 +57,27 @@ public class BotInitializer {
                             GatewayIntent.GUILD_VOICE_STATES,
                             GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
                             GatewayIntent.GUILD_WEBHOOKS,
-                            GatewayIntent.GUILD_INVITES
+                            GatewayIntent.GUILD_INVITES,
+                            GatewayIntent.GUILD_MESSAGE_REACTIONS
                     )
                     .addEventListeners(welcomeListener)
                     .addEventListeners(slashCommandListener)
                     .addEventListeners(slashCommandRegisterer)
                     .addEventListeners(ticketCommandListener)
-                    .addEventListeners(sugestionChannelListener)
+                    .addEventListeners(suggestionListener)
+                    .addEventListeners(messageListener)
                     .build();
-            jda.awaitReady();
 
+            jda.awaitReady();
             jda.getPresence().setStatus(OnlineStatus.IDLE);
 
-            if (jda == null) {
-                plugin.getLogger().severe("Error starting bot: JDA is null");
-                return;
-            }
-
+            // Iniciar o atualizador de status
             startStatusUpdater();
 
-            plugin.getLogger().info("Bot is ready!");
+            plugin.getLogger().info("Bot Discord pronto!");
+
         } catch (Exception e) {
-            plugin.getLogger().severe("Error starting bot: " + e.getMessage());
+            plugin.getLogger().severe("Erro ao iniciar o bot: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -105,8 +112,9 @@ public class BotInitializer {
     public void stopBot() {
         if (jda != null) {
             jda.shutdown();
+            plugin.getLogger().info("Bot Discord desligado.");
         } else {
-            System.out.println("JDA is null");
+            plugin.getLogger().warning("JDA está nulo. Não foi possível desligar o bot.");
         }
     }
 

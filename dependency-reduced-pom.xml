@@ -67,6 +67,10 @@
       <id>jitpack</id>
       <url>https://jitpack.io</url>
     </repository>
+    <repository>
+      <id>upstream</id>
+      <url>https://ci.nametagedit.com/plugin/repository/everything/</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
